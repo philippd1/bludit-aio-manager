@@ -21,9 +21,11 @@ let AIO_ThemeManager = {
 `);
 		callback(true);
 	},
-	load_table_data: () => {
+	load_table_data: (cb) => {
 		$.get('https://api.github.com/repos/bludit/themes-repository/contents/items', (data) => {
+			console.log(data.length);
 			for (var i = 0; i < data.length; i++) {
+				let current_installname = data[i].name;
 				$.get(
 					'https://raw.githubusercontent.com/bludit/themes-repository/master/items/' +
 						data[i].name +
@@ -31,7 +33,6 @@ let AIO_ThemeManager = {
 					(pluginInformation) => {
 						var pluginInformation = JSON.parse(pluginInformation);
 						var theme_name = pluginInformation.name;
-						var theme_version = pluginInformation.version;
 						var theme_version = pluginInformation.version;
 						var theme_download = pluginInformation.download_url;
 						if (pluginInformation.download_url_v2 != '' && pluginInformation.download_url_v2 != undefined) {
@@ -42,13 +43,16 @@ let AIO_ThemeManager = {
 						var theme_author_username = pluginInformation.author_username;
 
 						var new_table_row = `<tr>
-						<td class="align-middle pt-3 pb-3"><div data-id="name">${theme_name}</div><div class="mt-1"><button onclick="themeInstallerDialog(theme_name)" name="install" class="btn btn-primary my-2" type="submit" value="${theme_download}">Install 🚀</button></div></td>
+						<td class="align-middle pt-3 pb-3"><div data-id="name">${theme_name}</div><div class="mt-1"><span data-action="install-theme" data-download="${theme_download}" data-theme-name="${current_installname}" class="btn btn-primary my-2">Install 🚀</span></div></td>
 						<td class="align-middle d-none d-sm-table-cell"><div data-id="description">${theme_description}</div><a href="${theme_information_url}" target="_blank">more information</a></td>
 						<td class="text-center align-middle d-none d-lg-table-cell"><span>${theme_version}</span></td>
 						<td class="text-center align-middle d-none d-lg-table-cell"><a data-id="author" target="_blank">${theme_author_username}</a></td>
 						</tr>`;
 
 						$('#theme-download-extension-table-body').append(new_table_row);
+						if (i == data.length - 2) {
+							cb();
+						}
 					}
 				);
 			}
@@ -77,11 +81,62 @@ let AIO_ThemeManager = {
 				}
 			});
 		}
+	},
+	table_actions: {
+		set_install_listener: () => {
+			$('[data-action="install-theme"]').click(function(e) {
+				e.preventDefault();
+				$(e.currentTarget).unbind('click');
+				$(e.currentTarget).removeClass('btn-primary');
+				$(e.currentTarget).addClass('btn-warning');
+				$(e.currentTarget).html('Starting...👨‍💻');
+				let download_url = $(e.currentTarget).attr('data-download');
+				let current_theme_name = $(e.currentTarget).attr('data-theme-name');
+				let current_process_id = undefined;
+				$.post(aioManager_htmlPath + 'download-theme.php', {
+					action_start: ''
+				}).done(function(data) {
+					current_process_id = data;
+					$(e.currentTarget).html('Downloading...👨‍💻');
+					$.post(aioManager_htmlPath + 'download-theme.php', {
+						action_download: '',
+						url: download_url,
+						process_id: current_process_id
+					}).done(function(data) {
+						$(e.currentTarget).html('Unpacking...👨‍💻');
+						$.post(aioManager_htmlPath + 'download-theme.php', {
+							action_unpack: '',
+							process_id: current_process_id
+						}).done(function(data) {
+							$(e.currentTarget).html('Packing...👨‍💻');
+							$.post(aioManager_htmlPath + 'download-theme.php', {
+								action_repack: '',
+								process_id: current_process_id,
+								current_theme_name: current_theme_name
+							}).done(function(data) {
+								console.log(data);
+								// $(e.currentTarget).html('Cleaning...🧹');
+								// $.post(aioManager_htmlPath + 'download-theme.php', {
+								// 	action_clean: '',
+								// 	process_id: current_process_id
+								// }).done(function(data) {
+								// 	$(e.currentTarget).html('Done ✔');
+								// 	console.log(data);
+								// });
+							});
+						});
+					});
+				});
+			});
+		}
 	}
 };
 $(() => {
 	AIO_ThemeManager.generate_table(() => {
-		AIO_ThemeManager.load_table_data();
+		AIO_ThemeManager.load_table_data(() => {
+			// TODO: make this work
+			AIO_ThemeManager.table_actions.set_install_listener();
+		});
 		AIO_ThemeManager.table_filter.init();
 	});
 });

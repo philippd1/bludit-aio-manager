@@ -38,7 +38,7 @@ let AIO_PluginManager = {
 						let plugin_author_username = data.author_username;
 
 						let new_table_row = `<tr>
-                        <td class="align-middle pt-3 pb-3"><div data-id="name">${plugin_name}</div><div class="mt-1"><button name="install" class="btn btn-primary my-2" type="submit" value="${plugin_download_url_v2}">Install</button></div></td>
+                        <td class="align-middle pt-3 pb-3"><div data-id="name">${plugin_name}</div><div class="mt-1"><button name="install" class="btn btn-primary my-2" type="submit" value="${plugin_download_url_v2}">Install 🚀</button></div></td>
                         <td class="align-middle d-none d-sm-table-cell"><div data-id="description">${plugin_description}</div><a href="${plugin_information_url}" target="_blank">More information</a></td>
                         <td class="text-center align-middle d-none d-lg-table-cell"><span>${plugin_version}</span></td>
                         <td class="text-center align-middle d-none d-lg-table-cell"><a data-id="author" target="_blank">${plugin_author_username}</a></td>
