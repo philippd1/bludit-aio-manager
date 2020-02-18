@@ -1,6 +1,12 @@
 <?php
 class AIO_Manager extends Plugin
 {
+	public function init()
+	{
+		$this->formButtons = false;
+		// Check for zip extension installed
+		$this->zip = extension_loaded('zip');
+	}
 	public function form()
 	{
 		return '
@@ -29,9 +35,14 @@ class AIO_Manager extends Plugin
 	public function adminBodyEnd()
 	{
 		$scripts = "";
+		$scripts .= '<script>let aioManager_htmlPath="' . $this->htmlPath() . '";</script>';
+		$scripts .= '<script>let aioManager_domainPath="' . $this->domainPath() . '";</script>';
+		$scripts .= '<script>let aioManager_phpPath="' . $this->phpPath() . '";</script>';
 		$scripts .= '<script>' . file_get_contents($this->phpPath() . DS . 'autoupdater.js') . '</script>';
 		$scripts .= '<script>' . file_get_contents($this->phpPath() . DS . 'thememanager.js') . '</script>';
 		$scripts .= '<script>' . file_get_contents($this->phpPath() . DS . 'pluginmanager.js') . '</script>';
+
+
 		return $scripts;
 	}
 }

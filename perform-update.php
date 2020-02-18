@@ -45,7 +45,8 @@ if (isset($_POST['action_download'])) {
     download($_POST['url'], 'bludit-new.zip');
     update_status("newest Bludit downloaded @" . time());
     echo "download-done";
-} elseif (isset($_POST['action_unzip'])) {
+}
+if (isset($_POST['action_unzip'])) {
     update_status("unzipping @" . time());
     if (!file_exists("auto-updater-temp")) {
         mkdir('auto-updater-temp');
@@ -53,7 +54,8 @@ if (isset($_POST['action_download'])) {
     unzip('bludit-new.zip', dirname(__FILE__) . '/auto-updater-temp/');
     echo "unzip-done";
     update_status("unzipping done @" . time());
-} elseif (isset($_POST['action_update_language'])) {
+}
+if (isset($_POST['action_update_language'])) {
     update_status("update_language @" . time());
     $files_array = scandir('./auto-updater-temp/bludit-' . $_POST['tag'] . '/bl-languages');
     foreach ($files_array as $file) {
@@ -65,7 +67,8 @@ if (isset($_POST['action_download'])) {
     }
     echo "action_update_language-done";
     update_status("update_language done @" . time());
-} elseif (isset($_POST['action_update_kernel'])) {
+}
+if (isset($_POST['action_update_kernel'])) {
     update_status("update_kernel @" . time());
     $source_path = realpath('./auto-updater-temp/bludit-' . $_POST['tag'] . '/bl-kernel/');
     $zip = new ZipArchive();
@@ -87,14 +90,16 @@ if (isset($_POST['action_download'])) {
 
     echo "action_update_kernel-done";
     update_status("update_kernel done @" . time());
-} elseif (isset($_POST['cleanup'])) {
+}
+if (isset($_POST['cleanup'])) {
     update_status("cleanup @" . time());
     echo "cleanup-done";
     rmrf('./auto-updater-temp/');
     rmrf('./bludit-new.zip');
     update_status("cleanup done @" . time());
     update_status("Bludit was successfully upgraded to " . $_POST['tag'] . " @" . time());
-} elseif (isset($_POST['action_init'])) {
+}
+if (isset($_POST['action_init'])) {
     clean_status();
     update_status("update started @" . time());
     if (!empty($_POST['url'])) {

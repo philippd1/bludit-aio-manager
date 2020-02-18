@@ -21,7 +21,6 @@ let AIO_AutoUpdater = {
 	},
 	update_done: () => {
 		AIO_AutoUpdater.current_progress = 7;
-		console.log('cleanup-done');
 		$('#autoupdate_start_update').html('Update done 😎');
 		$('#autoupdate_start_update').removeClass('btn-warning');
 		$('#autoupdate_start_update').addClass('btn-success');
@@ -87,28 +86,31 @@ AIO_AutoUpdater.get_releases((releases) => {
 			$('#autoupdate_start_update').addClass('btn-warning');
 			let zip_path = `https://github.com/bludit/bludit/archive/${AIO_AutoUpdater.releases[0].tag_name}.zip`;
 			AIO_AutoUpdater.current_progress = 1;
-			$.post(HTML_PATH_ROOT + 'bl-plugins/bludit-auto-update/perform-update.php', {
+			$.post(aioManager_htmlPath + 'perform-update.php', {
 				url: zip_path,
 				tag: AIO_AutoUpdater.releases[0].tag_name,
 				action_init: true
 			}).done((data) => {
+				console.log(data);
 				if (data == 'init-done') {
 					AIO_AutoUpdater.current_progress = 2;
-					$.post(HTML_PATH_ROOT + 'bl-plugins/bludit-auto-update/perform-update.php', {
+					$.post(aioManager_htmlPath + 'perform-update.php', {
 						url: zip_path,
 						tag: AIO_AutoUpdater.releases[0].tag_name,
 						action_download: true
 					}).done((data) => {
+						console.log(data);
 						if (data == 'download-done') {
 							AIO_AutoUpdater.current_progress = 3;
-							$.post(HTML_PATH_ROOT + 'bl-plugins/bludit-auto-update/perform-update.php', {
+							$.post(aioManager_htmlPath + 'perform-update.php', {
 								url: zip_path,
 								tag: AIO_AutoUpdater.releases[0].tag_name,
 								action_unzip: true
 							}).done((data) => {
+								console.log(data);
 								if (data == 'unzip-done') {
 									AIO_AutoUpdater.current_progress = 4;
-									$.post(HTML_PATH_ROOT + 'bl-plugins/bludit-auto-update/perform-update.php', {
+									$.post(aioManager_htmlPath + 'perform-update.php', {
 										url: zip_path,
 										tag: AIO_AutoUpdater.releases[0].tag_name,
 										name: AIO_AutoUpdater.releases[0].name,
@@ -118,25 +120,18 @@ AIO_AutoUpdater.get_releases((releases) => {
 										console.log(data);
 										if (data == 'action_update_language-done') {
 											AIO_AutoUpdater.current_progress = 5;
-											$.post(
-												HTML_PATH_ROOT + 'bl-plugins/bludit-auto-update/perform-update.php',
-												{
-													url: zip_path,
-													tag: AIO_AutoUpdater.releases[0].tag_name,
-													action_update_kernel: true
-												}
-											).done((data) => {
+											$.post(aioManager_htmlPath + 'perform-update.php', {
+												url: zip_path,
+												tag: AIO_AutoUpdater.releases[0].tag_name,
+												action_update_kernel: true
+											}).done((data) => {
 												if (data == 'action_update_kernel-done') {
 													AIO_AutoUpdater.current_progress = 6;
-													$.post(
-														HTML_PATH_ROOT +
-															'bl-plugins/bludit-auto-update/perform-update.php',
-														{
-															url: zip_path,
-															tag: AIO_AutoUpdater.releases[0].tag_name,
-															cleanup: true
-														}
-													).done((data) => {
+													$.post(aioManager_htmlPath + 'perform-update.php', {
+														url: zip_path,
+														tag: AIO_AutoUpdater.releases[0].tag_name,
+														cleanup: true
+													}).done((data) => {
 														if (data == 'cleanup-done') {
 															AIO_AutoUpdater.update_done();
 														}
@@ -152,7 +147,7 @@ AIO_AutoUpdater.get_releases((releases) => {
 				}
 			});
 			setInterval(() => {
-				$.get(HTML_PATH_ROOT + 'bl-plugins/bludit-auto-update/get-status.php').done((data) => {
+				$.get(aioManager_htmlPath + 'get-status.php').done((data) => {
 					if (AIO_AutoUpdater.previous_status != data) {
 						$('#update_progress').html(data);
 						AIO_AutoUpdater.previous_status = data;
