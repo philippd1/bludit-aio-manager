@@ -22,7 +22,7 @@ let AIO_PluginManager = {
 		callback(true);
 	},
 	get_installed_plugins: (cb) => {
-		$.post(aioManager_htmlPath + 'get-installed-plugins.php').done(function(data) {
+		$.post(aioManager_htmlPath + 'get-installed-plugins.php').done((data) => {
 			data = JSON.parse(data);
 			cb(data);
 		});
@@ -31,14 +31,14 @@ let AIO_PluginManager = {
 		AIO_PluginManager.get_installed_plugins((installed_plugins) => {
 			console.log('installed_plugins');
 			console.log(installed_plugins);
-			$.get('https://api.github.com/repos/bludit/plugins-repository/contents/items', function(data) {
+			$.get('https://api.github.com/repos/bludit/plugins-repository/contents/items', (data) => {
 				for (let i = 0; i < data.length; i++) {
 					let current_installname = data[i].name;
 					$.get(
 						'https://raw.githubusercontent.com/bludit/plugins-repository/master/items/' +
 							data[i].name +
 							'/metadata.json',
-						function(data) {
+						(data) => {
 							data = JSON.parse(data);
 							let plugin_name = data.name;
 							let plugin_version = data.version;
@@ -98,7 +98,7 @@ let AIO_PluginManager = {
 	},
 	table_actions: {
 		set_update_listener: () => {
-			$('[data-action="update-plugin"]').click(function(e) {
+			$('[data-action="update-plugin"]').click((e) => {
 				console.log('update...');
 				$(e.currentTarget).unbind('click');
 				$(e.currentTarget).removeClass('btn-danger');

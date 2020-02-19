@@ -39,25 +39,31 @@ let AIO_ThemeManager = {
 						'https://raw.githubusercontent.com/bludit/themes-repository/master/items/' +
 							current_installname +
 							'/metadata.json',
-						(pluginInformation) => {
-							var pluginInformation = JSON.parse(pluginInformation);
-							var theme_name = pluginInformation.name;
-							var theme_version = pluginInformation.version;
-							var theme_download = pluginInformation.download_url;
-							if (
-								pluginInformation.download_url_v2 != '' &&
-								pluginInformation.download_url_v2 != undefined
-							) {
-								theme_download = pluginInformation.download_url_v2;
+						(theme_info) => {
+							theme_info = JSON.parse(theme_info);
+							var theme_name = theme_info.name;
+							var theme_version = theme_info.version;
+							var theme_download = theme_info.download_url;
+							if (theme_info.download_url_v2 != '' && theme_info.download_url_v2 != undefined) {
+								theme_download = theme_info.download_url_v2;
 							}
-							var theme_information_url = pluginInformation.information_url;
-							var theme_description = pluginInformation.description;
-							var theme_author_username = pluginInformation.author_username;
+							var theme_information_url = theme_info.information_url;
+							var theme_description = theme_info.description;
+							var theme_author_username = theme_info.author_username;
 
 							let install_btn = `<span data-action="install-theme" data-download="${theme_download}" data-theme-name="${current_installname}" class="btn btn-primary my-2">Install 🚀</span>`;
-							if (installed_themes.includes(current_installname)) {
-								install_btn = `<span class="btn btn-success my-2">Installed ✔</span>`;
-							}
+							// if (installed_themes.includes(current_installname)) {
+							// 	install_btn = `<span class="btn btn-success my-2">Installed ✔</span>`;
+							// }
+							installed_themes.forEach((installed_theme) => {
+								if (installed_theme.name == current_installname||installed_theme.parsed_name==current_installname) {
+									install_btn = `<span class="btn btn-success my-2">UpToDate: ${installed_theme.version} ✔</span>`;
+									if (installed_theme.version < theme_version) {
+										console.log('local is older');
+										install_btn = `<span data-action="update-theme" data-current-version="${installed_theme.version}" data-remote-version="${theme_version}" class="btn btn-danger my-2">Installed Version: ${installed_theme.version}<hr>Remote Version: ${theme_version}<br>Update now! ⬆</span>`;
+									}
+								}
+							});
 
 							var new_table_row = `<tr>
 						<td class="align-middle pt-3 pb-3"><div data-id="name">${theme_name}</div><div class="mt-1">${install_btn}</div></td>
