@@ -30,7 +30,7 @@ let AIO_ThemeManager = {
 	load_table_data: () => {
 		// TODO: implement updates/versions
 		AIO_ThemeManager.get_installed_themes((installed_themes) => {
-			console.log('installed themes:');
+			console.log('installed_themes');
 			console.log(installed_themes);
 			$.get('https://api.github.com/repos/bludit/themes-repository/contents/items', (data) => {
 				for (var i = 0; i < data.length; i++) {
