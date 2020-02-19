@@ -21,38 +21,56 @@ let AIO_ThemeManager = {
 `);
 		callback(true);
 	},
+	get_installed_themes: (cb) => {
+		$.post(aioManager_htmlPath + 'get-installed-themes.php').done(function(data) {
+			data = JSON.parse(data);
+			cb(data);
+		});
+	},
 	load_table_data: () => {
-		// TODO: implement updates + already installed
-		$.get('https://api.github.com/repos/bludit/themes-repository/contents/items', (data) => {
-			for (var i = 0; i < data.length; i++) {
-				let current_installname = data[i].name;
-				$.get(
-					'https://raw.githubusercontent.com/bludit/themes-repository/master/items/' +
-						current_installname +
-						'/metadata.json',
-					(pluginInformation) => {
-						var pluginInformation = JSON.parse(pluginInformation);
-						var theme_name = pluginInformation.name;
-						var theme_version = pluginInformation.version;
-						var theme_download = pluginInformation.download_url;
-						if (pluginInformation.download_url_v2 != '' && pluginInformation.download_url_v2 != undefined) {
-							theme_download = pluginInformation.download_url_v2;
-						}
-						var theme_information_url = pluginInformation.information_url;
-						var theme_description = pluginInformation.description;
-						var theme_author_username = pluginInformation.author_username;
+		// TODO: implement updates/versions
+		AIO_ThemeManager.get_installed_themes((installed_themes) => {
+			console.log('installed themes:');
+			console.log(installed_themes);
+			$.get('https://api.github.com/repos/bludit/themes-repository/contents/items', (data) => {
+				for (var i = 0; i < data.length; i++) {
+					let current_installname = data[i].name;
+					$.get(
+						'https://raw.githubusercontent.com/bludit/themes-repository/master/items/' +
+							current_installname +
+							'/metadata.json',
+						(pluginInformation) => {
+							var pluginInformation = JSON.parse(pluginInformation);
+							var theme_name = pluginInformation.name;
+							var theme_version = pluginInformation.version;
+							var theme_download = pluginInformation.download_url;
+							if (
+								pluginInformation.download_url_v2 != '' &&
+								pluginInformation.download_url_v2 != undefined
+							) {
+								theme_download = pluginInformation.download_url_v2;
+							}
+							var theme_information_url = pluginInformation.information_url;
+							var theme_description = pluginInformation.description;
+							var theme_author_username = pluginInformation.author_username;
 
-						var new_table_row = `<tr>
-						<td class="align-middle pt-3 pb-3"><div data-id="name">${theme_name}</div><div class="mt-1"><span data-action="install-theme" data-download="${theme_download}" data-theme-name="${current_installname}" class="btn btn-primary my-2">Install 🚀</span></div></td>
+							let install_btn = `<span data-action="install-theme" data-download="${theme_download}" data-theme-name="${current_installname}" class="btn btn-primary my-2">Install 🚀</span>`;
+							if (installed_themes.includes(current_installname)) {
+								install_btn = `<span class="btn btn-success my-2">Installed ✔</span>`;
+							}
+
+							var new_table_row = `<tr>
+						<td class="align-middle pt-3 pb-3"><div data-id="name">${theme_name}</div><div class="mt-1">${install_btn}</div></td>
 						<td class="align-middle d-none d-sm-table-cell"><div data-id="description">${theme_description}</div><a href="${theme_information_url}" target="_blank">more information</a></td>
 						<td class="text-center align-middle d-none d-lg-table-cell"><span>${theme_version}</span></td>
 						<td class="text-center align-middle d-none d-lg-table-cell"><a data-id="author" target="_blank">${theme_author_username}</a></td>
 						</tr>`;
 
-						$('#theme-download-extension-table-body').append(new_table_row);
-					}
-				);
-			}
+							$('#theme-download-extension-table-body').append(new_table_row);
+						}
+					);
+				}
+			});
 		});
 	},
 	table_filter: {
