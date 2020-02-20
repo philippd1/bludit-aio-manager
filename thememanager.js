@@ -52,11 +52,11 @@ let AIO_ThemeManager = {
 							var theme_author_username = theme_info.author_username;
 
 							let install_btn = `<span data-action="install-theme" data-download="${theme_download}" data-theme-name="${current_installname}" class="btn btn-primary my-2">Install 🚀</span>`;
-							// if (installed_themes.includes(current_installname)) {
-							// 	install_btn = `<span class="btn btn-success my-2">Installed ✔</span>`;
-							// }
 							installed_themes.forEach((installed_theme) => {
-								if (installed_theme.name == current_installname||installed_theme.parsed_name==current_installname) {
+								if (
+									installed_theme.name == current_installname ||
+									installed_theme.parsed_name == current_installname
+								) {
 									install_btn = `<span class="btn btn-success my-2">UpToDate: ${installed_theme.version} ✔</span>`;
 									if (installed_theme.version < theme_version) {
 										console.log('local is older');

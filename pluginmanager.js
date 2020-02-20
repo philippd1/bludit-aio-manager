@@ -1,3 +1,4 @@
+// TODO: handle update
 let AIO_PluginManager = {
 	generate_table: (callback) => {
 		$('#pluginmanager_dynamic_content').html(`
@@ -42,14 +43,17 @@ let AIO_PluginManager = {
 							data = JSON.parse(data);
 							let plugin_name = data.name;
 							let plugin_version = data.version;
-							let plugin_download_url_v2 = data.download_url_v2;
+							let plugin_download_url = data.download_url_v2;
+							if (plugin_download_url == undefined || plugin_download_url == '') {
+								plugin_download_url = data.download_url;
+							}
 							let plugin_information_url = data.information_url;
 							let plugin_description = data.description;
 							let plugin_author_username = data.author_username;
 
-							let install_btn = `<span data-action="install-plugin" data-download="${plugin_download_url_v2}" data-plugin-name="${current_installname}" class="btn btn-primary my-2">Install 🚀</span>`;
+							let install_btn = `<span data-action="install-plugin" data-download="${plugin_download_url}" data-plugin-name="${current_installname}" class="btn btn-primary my-2">Install 🚀</span>`;
 							installed_plugins.forEach((installed_plugin) => {
-								if (installed_plugin.name == current_installname) {
+								if (installed_plugin.parsed_name == current_installname) {
 									install_btn = `<span class="btn btn-success my-2">UpToDate: ${installed_plugin.version} ✔</span>`;
 									if (installed_plugin.version < plugin_version) {
 										console.log('local is older');
@@ -119,38 +123,44 @@ let AIO_PluginManager = {
 				$(e.currentTarget).addClass('btn-warning');
 				$(e.currentTarget).html('Starting...👨‍💻');
 				let download_url = $(e.currentTarget).attr('data-download');
-				// let current_process_id = undefined;
-				// $.post(aioManager_htmlPath + 'download-plugin.php', {
-				// 	action_start: ''
-				// }).done((data) => {
-				// 	console.log(data);
-				// 	current_process_id = data;
-				// 	$(e.currentTarget).html('Downloading...👨‍💻');
-				// 	$.post(aioManager_htmlPath + 'download-plugin.php', {
-				// 		action_download: '',
-				// 		url: download_url,
-				// 		process_id: current_process_id
-				// 	}).done((data) => {
-				// 		console.log(data);
-				// 		$(e.currentTarget).html('Installing...👨‍💻');
-				// 		$.post(aioManager_htmlPath + 'download-plugin.php', {
-				// 			action_install: '',
-				// 			process_id: current_process_id
-				// 		}).done((data) => {
-				// 			console.log(data);
-				// 			$(e.currentTarget).html('Cleaning...🧹');
-				// 			$.post(aioManager_htmlPath + 'download-plugin.php', {
-				// 				action_clean: '',
-				// 				process_id: current_process_id
-				// 			}).done((data) => {
-				// 				console.log(data);
-				// 				$(e.currentTarget).html('Installed ✔');
-				// 				$(e.currentTarget).removeClass('btn-warning');
-				// 				$(e.currentTarget).addClass('btn-success');
-				// 			});
-				// 		});
-				// 	});
-				// });
+				let current_process_id = undefined;
+				$.post(aioManager_htmlPath + 'download-plugin.php', {
+					action_start: ''
+				}).done((data) => {
+					console.log(data);
+					current_process_id = data;
+					$(e.currentTarget).html('Downloading...👨‍💻');
+					$.post(aioManager_htmlPath + 'download-plugin.php', {
+						action_download: '',
+						url: download_url,
+						process_id: current_process_id
+					}).done((data) => {
+						console.log(data);
+						if (data == 'download_complete') {
+							$(e.currentTarget).html('Installing...👨‍💻');
+							$.post(aioManager_htmlPath + 'download-plugin.php', {
+								action_install: '',
+								process_id: current_process_id
+							}).done((data) => {
+								console.log(data);
+								$(e.currentTarget).html('Cleaning...🧹');
+								$.post(aioManager_htmlPath + 'download-plugin.php', {
+									action_clean: '',
+									process_id: current_process_id
+								}).done((data) => {
+									console.log(data);
+									$(e.currentTarget).html('Installed ✔');
+									$(e.currentTarget).removeClass('btn-warning');
+									$(e.currentTarget).addClass('btn-success');
+								});
+							});
+						} else {
+							$(e.currentTarget).html('Plugin is not existant...😑');
+							$(e.currentTarget).removeClass('btn-warning');
+							$(e.currentTarget).addClass('btn-danger');
+						}
+					});
+				});
 			});
 		}
 	}

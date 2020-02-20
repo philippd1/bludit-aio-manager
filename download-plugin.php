@@ -1,4 +1,17 @@
 <?php
+$AUTOUPDATE_statusfile = dirname(__FILE__) . '/status.json';
+function clean_status()
+{
+    global $AUTOUPDATE_statusfile;
+    unlink($AUTOUPDATE_statusfile);
+}
+function update_status($content)
+{
+    global $AUTOUPDATE_statusfile;
+    $myfile = fopen($AUTOUPDATE_statusfile, "a") or die("Unable to open file!");
+    fwrite($myfile, $content . "\n");
+    fclose($myfile);
+}
 function download($url, $filename)
 {
     $content = file_get_contents($url);
@@ -33,8 +46,13 @@ if (isset($_POST['action_start'])) {
     echo $process_id;
 }
 if (isset($_POST['action_download'])) {
-    download($_POST['url'], 'plugin_' . $_POST['process_id'] . '.zip');
-    echo "download_complete";
+    $file_exists = @file_get_contents($_POST['url']);
+    if ($file_exists) {
+        download($_POST['url'], 'plugin_' . $_POST['process_id'] . '.zip');
+        echo "download_complete";
+    } else {
+        echo "file_nonexistant";
+    }
 }
 if (isset($_POST['action_install'])) {
     unzip('plugin_' . $_POST['process_id'] . '.zip', '../../bl-plugins/');
@@ -43,4 +61,8 @@ if (isset($_POST['action_install'])) {
 if (isset($_POST['action_clean'])) {
     rmrf('plugin_' . $_POST['process_id'] . '.zip');
     echo "clean_complete";
+}
+if (isset($_POST['action_remove'])) {
+    rmrf('../../bl-plugins/' . $_POST['plugin_dirname']);
+    echo "remove_complete";
 }
