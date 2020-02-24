@@ -1,25 +1,45 @@
 // TODO: handle update
 let AIO_PluginManager = {
-	generate_table: (callback) => {
+	generate_ui: (callback) => {
 		$('#pluginmanager_dynamic_content').html(`
-        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#aio_pluginmanager_table" aria-expanded="false" aria-controls="aio_pluginmanager_table">View all plugins 🔍</button>
-  <div class="collapse" id="aio_pluginmanager_table">
-  <div class="card card-body">
-  <input type="text" id="plugin-light-table-filter" data-table="order-table" placeholder="Search by name, description or author">
-  <table id="plugin-download-extension-table" class="table mt-3 order-table">
-  <thead>
-  <tr>
-  <th class="border-bottom-0 w-25" scope="col">Name</th>
-  <th class="border-bottom-0 d-none d-sm-table-cell" scope="col">description</th>
-  <th class="text-center border-bottom-0 d-none d-lg-table-cell" scope="col">version</th>
-  <th class="text-center border-bottom-0 d-none d-lg-table-cell" scope="col">author</th>
-  </tr>
-  </thead>
-  <tbody id="plugin-download-extension-table-body"></tbody>
-  </table>
-  </div>
-</div>
-`);
+		<div class="modal" tabindex="-1" role="dialog" id="myModal">
+		<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		<div class="modal-header">
+		<h5 class="modal-title">Install Plugin from ZIP URL</h5>
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+		</button>
+		</div>
+		<div class="modal-body">
+		<input type="text" class="form-control" id="plugin_zip_url" placeholder="ZIP URL">
+		</div>
+		<div class="modal-footer">
+		<button type="button" class="btn btn-primary" id="confirm_plugin_zip_url">Install Plugin</button>
+		<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+		</div>
+		</div>
+		</div>
+		</div>
+		<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#aio_pluginmanager_table" aria-expanded="false" aria-controls="aio_pluginmanager_table">View all plugins 🔍</button>
+		<span class="btn btn-primary" id="install_plugin_from_zip_url">Install Plugin from ZIP URL</span>
+		<div class="collapse" id="aio_pluginmanager_table">
+		<div class="card card-body">
+		<input type="text" id="plugin-light-table-filter" data-table="order-table" placeholder="Search by name, description or author">
+		<table id="plugin-download-extension-table" class="table mt-3 order-table">
+		<thead>
+		<tr>
+		<th class="border-bottom-0 w-25" scope="col">Name</th>
+		<th class="border-bottom-0 d-none d-sm-table-cell" scope="col">description</th>
+		<th class="text-center border-bottom-0 d-none d-lg-table-cell" scope="col">version</th>
+		<th class="text-center border-bottom-0 d-none d-lg-table-cell" scope="col">author</th>
+		</tr>
+		</thead>
+		<tbody id="plugin-download-extension-table-body"></tbody>
+		</table>
+		</div>
+		</div>
+		`);
 		callback(true);
 	},
 	get_installed_plugins: (cb) => {
@@ -63,11 +83,11 @@ let AIO_PluginManager = {
 							});
 
 							let new_table_row = `<tr>
-                        <td class="align-middle pt-3 pb-3"><div data-id="name">${plugin_name}</div><div class="mt-1">${install_btn}</div></td>
-                        <td class="align-middle d-none d-sm-table-cell"><div data-id="description">${plugin_description}</div><a href="${plugin_information_url}" target="_blank">More information</a></td>
-                        <td class="text-center align-middle d-none d-lg-table-cell"><span>${plugin_version}</span></td>
-                        <td class="text-center align-middle d-none d-lg-table-cell"><a data-id="author" target="_blank">${plugin_author_username}</a></td>
-                        </tr>`;
+						<td class="align-middle pt-3 pb-3"><div data-id="name">${plugin_name}</div><div class="mt-1">${install_btn}</div></td>
+						<td class="align-middle d-none d-sm-table-cell"><div data-id="description">${plugin_description}</div><a href="${plugin_information_url}" target="_blank">More information</a></td>
+						<td class="text-center align-middle d-none d-lg-table-cell"><span>${plugin_version}</span></td>
+						<td class="text-center align-middle d-none d-lg-table-cell"><a data-id="author" target="_blank">${plugin_author_username}</a></td>
+						</tr>`;
 
 							$('#plugin-download-extension-table-body').append(new_table_row);
 						}
@@ -166,9 +186,17 @@ let AIO_PluginManager = {
 	}
 };
 $(() => {
-	AIO_PluginManager.generate_table(() => {
+	AIO_PluginManager.generate_ui(() => {
 		AIO_PluginManager.load_table_data();
 		AIO_PluginManager.table_filter.init();
+		$('#install_plugin_from_zip_url').click(function(e) {
+			console.log('lelele');
+			$('#myModal').modal();
+		});
+		$('#confirm_plugin_zip_url').click(function(e) {
+			let value = $('#plugin_zip_url').val();
+			console.log(value);
+		});
 	});
 	$('[data-target="#aio_pluginmanager_table"]').click((e) => {
 		$('[data-target="#aio_pluginmanager_table"]').unbind('click');
